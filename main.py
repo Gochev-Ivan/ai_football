@@ -25,6 +25,14 @@ if __name__ == "__main__":
                     dy1 = -5
                 if event.key == pygame.K_DOWN:
                     dy1 = 5
+                if event.key == pygame.K_a:
+                    dx2 = -5
+                if event.key == pygame.K_d:
+                    dx2 = 5
+                if event.key == pygame.K_w:
+                    dy2 = -5
+                if event.key == pygame.K_s:
+                    dy2 = 5
                 if event.key == pygame.K_ESCAPE:
                     gameExit = True
             if event.type == pygame.KEYUP:
@@ -32,18 +40,34 @@ if __name__ == "__main__":
                     dx1 = 0
                 if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     dy1 = 0
-        if x1 < 0:
-            x1 = 0
-        if y1 < 0:
-            y1 = 0
-        if x1 > resolution[0] - 50:
-            x1 = resolution[0] - 50
-        if y1 > resolution[1] - 50:
-            y1 = resolution[1] - 50
-        print "(x1, y1)", (x1,y1)
+                if event.key == pygame.K_a or event.key == pygame.K_d:
+                    dx2 = 0
+                if event.key == pygame.K_w or event.key == pygame.K_s:
+                    dy2 = 0
+        if x1 < (radius + width):
+            x1 = (radius + width)
+        if y1 < (radius + width):
+            y1 = (radius + width)
+        if x1 > resolution[0] - (radius + width):
+            x1 = resolution[0] - (radius + width)
+        if y1 > resolution[1] - (radius + width):
+            y1 = resolution[1] - (radius + width)
+        if x2 < (radius + width):
+            x2 = (radius + width)
+        if y2 < (radius + width):
+            y2 = (radius + width)
+        if x2 > resolution[0] - (radius + width):
+            x2 = resolution[0] - (radius + width)
+        if y2 > resolution[1] - (radius + width):
+            y2 = resolution[1] - (radius + width)
+        print "(x1, y1)", player1
+        print "(x2, y2)", (x2,y2)
         x1 += dx1
         y1 += dy1
+        x2 += dx2
+        y2 += dy2
         gameDisplay.blit(background,(0,0))
-        pygame.draw.circle(gameDisplay,blue,(x1,y1),10,10)
+        pygame.draw.circle(gameDisplay,blue,(x1,y1),radius,width)
+        pygame.draw.circle(gameDisplay,red,(x2,y2),radius,width)
         render()
     pygame.quit()
