@@ -16,7 +16,8 @@ background_color = white
 background_picture = "background.png"
 
 # Agent parameters:
-x1 = 50
-y1 = 50
-dx1 = 0
-dy1 = 0
+radius,width = 10,10
+x1,y1 = 50,50
+x2,y2 = 150,150
+dx1,dy1 = 0,0
+dx2,dy2 = 0,0
