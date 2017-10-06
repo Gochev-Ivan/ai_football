@@ -1,6 +1,8 @@
 # Game features:
-frames = 60
+fps = 60
+dt = 1/fps
 resolution = 580, 287
+playground = 500, 250
 gameExit = False
 gameName = 'AI Football'
 
@@ -8,6 +10,7 @@ gameName = 'AI Football'
 black = [0, 0, 0]
 white = [255, 255, 255]
 red = [255, 0, 0]
+green = [0, 255, 0]
 sky_blue = [135, 206, 250]
 blue = [0, 0, 255]
 
@@ -16,8 +19,6 @@ background_color = white
 background_picture = "background.png"
 
 # Agent parameters:
-radius,width = 10,10
-x1,y1 = 50,50
-x2,y2 = 150,150
-dx1,dy1 = 0,0
-dx2,dy2 = 0,0
+radius, width = 25, 10
+ball_radius = 15
+
