@@ -22,3 +22,4 @@ background_picture = "background.png"
 radius, width = 25, 10
 ball_radius = 15
 
+cursor_width = 5

@@ -1,23 +1,42 @@
 import pygame
 from constants import *
-# from player import Player
 from functions import *
 import numpy as np
-from math import atan2
 
 
-class Object:
+class Circle:
     mass = 1
     x, y = 50, 50
     v_x, v_y = 0, 0
     v = 0
     alpha = 0
-    radius = 10
+    radius = 20
+    type_of_circle = ''
 
     def init(self, x, y, mass):
         self.x = x
         self.y = y
         self.mass = mass
+
+    def move(self):
+        self.x += np.cos(self.alpha) * self.v * dt
+        self.y += np.sin(self.alpha) * self.v * dt
+        if self.type_of_circle == 'ball':
+            self.v *= 0.99
+
+    def draw(self):
+        pygame.draw.circle(game, blue, [int(self.x), int(self.y)], self.radius)
+        new_x = self.x + self.radius * np.cos(self.alpha)
+        new_y = self.y + self.radius * np.sin(self.alpha)
+        pygame.draw.line(game, black, [self.x, self.y], [new_x, new_y], cursor_width)
+
+
+class Player(Circle):
+    q = 1
+
+
+class Ball(Circle):
+    q = 1
 
 
 def render():
@@ -43,106 +62,81 @@ if __name__ == "__main__":
     ball_x, ball_y = 100, 100
     v = 0
     v_x1, v_y1 = 0, 0
-    velocity_step = 100
+    velocity_step = 10
     angle_step = 0.1
-    player_1 = Object()
-    player_2 = Object()
-    player_3 = Object()
-    player_1.x, player_1.y = 50, 50
-    player_2.x, player_2.y = 150, 150
-    player_3.x, player_3.y = 200, 200
+    angle_change = 0
+    velocity_change = 0
+    player_1 = Circle()
+    player_2 = Circle()
+    player_3 = Circle()
+    player_1.x, player_1.y, player_1.mass = 50, 50, 100
+    player_2.x, player_2.y, player_1.mass = 150, 150, 80
+    player_3.x, player_3.y, player_1.mass = 200, 200, 72
+    player_1.type_of_circle = 'player'
+    player_2.type_of_circle = 'player'
+    player_3.type_of_circle = 'player'
+    ball = Circle()
+    ball.radius = 10
+    ball.x, ball.y = 100, 200
+    ball.type_of_circle = 'ball'
+    ball.mass = 0.5
+    shoot_requst = False
+
     while not gameExit:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 gameExit = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    dx1 = -5
-                    v_x1 -= velocity_step
-                    player_1.v_x -= velocity_step
-                    player_1.alpha -= angle_step
+                    angle_change = -angle_step
                 if event.key == pygame.K_RIGHT:
-                    dx1 = 5
-                    v_x1 += velocity_step
-                    player_1.v_x += velocity_step
-                    player_1.alpha += angle_step
+                    angle_change = angle_step
                 if event.key == pygame.K_UP:
-                    dy1 = -5
-                    v_y1 -= velocity_step
-                    player_1.v_y -= velocity_step
-                    player_1.v += velocity_step
+                    velocity_change = velocity_step
+                    player_1.v += velocity_change
                 if event.key == pygame.K_DOWN:
-                    dy1 = 5
-                    v_y1 += velocity_step
-                    player_1.v_y += velocity_step
-                    player_1.v -= velocity_step
-                if event.key == pygame.K_a:
-                    dx2 = -5
-                if event.key == pygame.K_d:
-                    dx2 = 5
-                if event.key == pygame.K_w:
-                    dy2 = -5
+                    velocity_change = -velocity_step
+                    player_1.v += velocity_change
                 if event.key == pygame.K_s:
-                    dy2 = 5
+                    print("sut na topka aktiviran!")
+                    shoot_requst = True
+                    # shoot(player_1, ball)
+                if event.key == pygame.K_d:
+                    print("sut na topka deaktiviran!")
+                    shoot_requst = False
                 if event.key == pygame.K_ESCAPE:
                     gameExit = True
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                    dx1 = 0
+                    angle_change = 0
                 if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                    dy1 = 0
+                    angle_change = 0
                 if event.key == pygame.K_a or event.key == pygame.K_d:
-                    dx2 = 0
+                    velocity_change = 0
                 if event.key == pygame.K_w or event.key == pygame.K_s:
-                    dy2 = 0
-        """===================== Coordinates Eval =========================="""
-        # x1 += v_x1 * dt
-        # y1 += v_y1 * dt
-        x2 += dx2
-        y2 += dy2
+                    velocity_change = 0
 
-        m = 1
-        F = 50
-        a = 50
-        alfa = np.pi/2
-        v += a * dt
-        # v = np.clip(v, 0, v_max)
-        ball_x += np.cos(alfa) * v * dt
-        ball_y += np.sin(alfa) * v * dt
-        player_1.x += np.cos(player_1.alpha) * player_1.v * dt
-        player_1.y += np.sin(player_1.alpha) * player_1.v * dt
-        player_2.x += np.cos(player_2.alpha) * player_2.v * dt
-        player_2.y += np.sin(player_2.alpha) * player_2.v * dt
-        player_3.x += np.cos(player_3.alpha) * player_3.v * dt
-        player_3.y += np.sin(player_3.alpha) * player_3.v * dt
-        # x2 += np.cos(alfa) * v * dt
+        player_1.alpha += angle_change
+        # player_1.v += velocity_change
+        if player_1.v < 0:
+            player_1.v = 0
+        for player in [player_1, ball]:
+            player.move()
 
-        # x1, y1 = get_back(x1, y1)
-        # x2, y2 = get_back(x2, y2)
-        # ball_x, ball_y = get_back(ball_x, ball_y)
-        """================================================================="""
-        # check for collision:
-        x = [x1, x2]
-        y = [y1, y2]
-
-        # for player in [player_1, player_2]:
-        # player_1.x, player_1.y = get_back(player_1)
-        player1 = snelius(player_1)
-        player2 = snelius(player_2)
-        player3 = snelius(player_3)
-
-        if collision(player_1, player_2):
-            print('sudar')
-            resolve_collision(player_1, player_2)
-        # player_2.x, player_2.y = get_back(player_2)
+        circles = [player_1, ball]
+        for i in range(len(circles)):
+            circles[i] = snelius(circles[i])
+            for j in range(i+1, len(circles)):
+                if collision(circles[i], circles[j]):
+                    circles[i], circles[j] = resolve_collision(circles[i], circles[j], shoot_requsted=shoot_requst)
 
         game.blit(background, (0, 0))
-        pygame.draw.circle(game, blue, [int(player_1.x), int(player_1.y)], player_1.radius)
-        pygame.draw.circle(game, red, [int(player_2.x), int(player_2.y)], player_2.radius)
-        pygame.draw.circle(game, green, [int(ball_x), int(ball_y)], ball_radius)
-        pygame.draw.rect(game, black, [0, 0, *playground], 2)
-        message = "player1: alpha: {:3f} v_x: {} v_y: {} v: {}".format(player_1.alpha * 180 / np.pi, player_1.v_x,
-                                                                    player_1.v_y, player_1.v)
+        player_1.draw()
+        for player in [player_1]:
+            player.draw()
+        pygame.draw.circle(game, green, [int(ball.x), int(ball.y)], ball.radius)
+        pygame.draw.rect(game, black, [0, 0, playground[0], playground[1]], 2)
+        message = "player_1: alpha: {:3f} v: {:3f} ball_v: {:3f}".format(player_1.alpha * 180 / np.pi, player_1.v, ball.v)
         label = myfont.render(message, 1, (0, 0, 0))
         game.blit(label, (20, 260))
         render()

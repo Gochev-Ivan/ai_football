@@ -2,8 +2,8 @@ from constants import *
 import numpy as np
 
 
-def collision(object1, object2):
-    if (object1.x - object2.x)**2 + (object1.y - object2.y)**2 <= (object1.radius + object2.radius)**2:
+def collision(circle1, circle2):
+    if (circle1.x - circle2.x)**2 + (circle1.y - circle2.y)**2 <= (circle1.radius + circle2.radius)**2:
         return True
     return False
 
@@ -33,89 +33,100 @@ def boundaries(x, y):
 
 
 def get_back(circle):
-    # if circle.x < radius:
-    #     circle.alpha =
-    circle.x = np.clip(circle.x, radius, resolution[0] - radius)
-    circle.y = np.clip(circle.y, radius, resolution[1] - radius)
+    circle.x = np.clip(circle.x, radius, playground[0] - radius)
+    circle.y = np.clip(circle.y, radius, playground[1] - radius)
     return circle
 
 
-def resolve_collision(object1, object2):
-    collision_angle = np.arctan2(object2.y - object1.y, object2.x - object1.x)
-    # speed1 = np.sqrt(object1.v_x**2 + object1.v_y**2)
-    # speed2 = np.sqrt(object2.v_x**2 + object2.v_y**2)
+def resolve_collision(circle1, circle2, shoot_requsted):
+    collision_angle = np.arctan2(circle2.y - circle1.y, circle2.x - circle1.x)
 
-    # direction_1 = np.arctan2(object1.v_y, object1.v_x)
-    # direction_2 = np.arctan2(object2.v_y, object2.v_x)
-    new_x_speed_1 = object1.v * np.cos(object1.alpha - collision_angle)
-    new_y_speed_1 = object1.v * np.sin(object1.alpha - collision_angle)
-    new_x_speed_2 = object2.v * np.cos(object2.alpha - collision_angle)
-    new_y_speed_2 = object2.v * np.sin(object2.alpha - collision_angle)
+    new_x_speed_1 = circle1.v * np.cos(circle1.alpha - collision_angle)
+    new_y_speed_1 = circle1.v * np.sin(circle1.alpha - collision_angle)
+    new_x_speed_2 = circle2.v * np.cos(circle2.alpha - collision_angle)
+    new_y_speed_2 = circle2.v * np.sin(circle2.alpha - collision_angle)
 
-    final_x_speed_1 = ((object1.mass - object2.mass) * new_x_speed_1 + (object2.mass + object2.mass) * new_x_speed_2) \
-                      / (object1.mass + object2.mass)
-    final_x_speed_2 = ((object1.mass + object1.mass) * new_x_speed_1 + (object2.mass - object1.mass) * new_x_speed_2) \
-                      / (object1.mass + object2.mass)
+    final_x_speed_1 = ((circle1.mass - circle2.mass) * new_x_speed_1 + (circle2.mass + circle2.mass) * new_x_speed_2) \
+                      / (circle1.mass + circle2.mass)
+    final_x_speed_2 = ((circle1.mass + circle1.mass) * new_x_speed_1 + (circle2.mass - circle1.mass) * new_x_speed_2) \
+                      / (circle1.mass + circle2.mass)
     final_y_speed_1 = new_y_speed_1
     final_y_speed_2 = new_y_speed_2
 
     cos_gamma = np.cos(collision_angle)
     sin_gamma = np.sin(collision_angle)
-    object1.v_x = cos_gamma * final_x_speed_1 - sin_gamma * final_y_speed_1
-    object1.v_y = sin_gamma * final_x_speed_1 + cos_gamma * final_y_speed_1
-    object2.v_x = cos_gamma * final_x_speed_2 - sin_gamma * final_y_speed_2
-    object2.v_y = sin_gamma * final_x_speed_2 + cos_gamma * final_y_speed_2
+    circle1.v_x = cos_gamma * final_x_speed_1 - sin_gamma * final_y_speed_1
+    circle1.v_y = sin_gamma * final_x_speed_1 + cos_gamma * final_y_speed_1
+    circle2.v_x = cos_gamma * final_x_speed_2 - sin_gamma * final_y_speed_2
+    circle2.v_y = sin_gamma * final_x_speed_2 + cos_gamma * final_y_speed_2
 
-    pos1 = np.array([object1.x, object1.y])
-    pos2 = np.array([object2.x, object2.y])
+    pos1 = np.array([circle1.x, circle1.y])
+    pos2 = np.array([circle2.x, circle2.y])
 
     # get the mtd
     pos_diff = pos1 - pos2
     d = np.linalg.norm(pos_diff)
 
     # minimum translation distance to push balls apart after intersecting
-    mtd = pos_diff * (((object1.radius + object2.radius) - d) / d)
+    mtd = pos_diff * (((circle1.radius + circle2.radius) - d) / d)
 
     # resolve intersection --
     # computing inverse mass quantities
-    im1 = 1 / object1.mass
-    im2 = 1 / object2.mass
+    im1 = 1 / circle1.mass
+    im2 = 1 / circle2.mass
 
     # push-pull them apart based off their mass
     pos1 = pos1 + mtd * (im1 / (im1 + im2))
     pos2 = pos2 - mtd * (im2 / (im1 + im2))
-    object1.x, object1.y = pos1[0], pos1[1]
-    object2.x, object2.y = pos2[0], pos2[1]
+    circle1.x, circle1.y = pos1[0], pos1[1]
+    circle2.x, circle2.y = pos2[0], pos2[1]
 
-    object1.v = np.sqrt(object1.v_x**2 + object1.v_y**2)
-    object2.v = np.sqrt(object2.v_x**2 + object2.v_y**2)
-    object1.alpha = np.arctan2(object1.y, object1.x)
-    object2.alpha = np.arctan2(object2.y, object2.x)
+    if circle1.type_of_circle == 'player' and circle2.type_of_circle == 'player':
+        circle1.v = 0.5 * np.sqrt(circle1.v_x**2 + circle1.v_y**2)
+        circle2.v = 0.5 * np.sqrt(circle2.v_x**2 + circle2.v_y**2)
+    if circle1.type_of_circle == 'player' and circle2.type_of_circle == 'ball':
+        print("sudar na igrac so topka!")
+        circle1.v = np.sqrt(circle1.v_x**2 + circle1.v_y**2)
+        if shoot_requsted == True:
+            circle2.v += 250
+        else:
+            circle2.v = 0.8 * np.sqrt(circle2.v_x**2 + circle2.v_y**2)
+        # prior = 1 if shoot_requsted else 0.1
+    circle1.alpha = np.arctan2(circle1.v_y, circle1.v_x)
+    circle2.alpha = np.arctan2(circle2.v_y, circle2.v_x)
 
-    snelius(object1)
-    snelius(object2)
+    snelius(circle1)
+    snelius(circle2)
 
-    # if object1.x + object1.radius >= playground[0] or object1.x - object1.radius <= 0:
-    #     object1.v_x = -1 * object1.v_x
-    #
-    # if object1.y + object1.radius >= playground[1] or object1.y - object1.radius <= 0:
-    #     object1.v_y = -1 * object1.v_y
-    #
-    # if object2.x + object2.radius >= playground[0] or object2.x - object2.radius <= 0:
-    #     object2.v_x = -1 * object2.v_x
-    #
-    # if object2.y + object2.radius >= playground[1] or object2.y - object2.radius <= 0:
-    #     object2.v_y = -1 * object2.v_y
+    return circle1, circle2
 
 
 def snelius(circle):
-    # Snell's Law
-    if circle.y + circle.radius >= playground[1]:
+    if circle.y + circle.radius >= playground[1] and np.sin(circle.alpha) > 0:
         circle.alpha = -circle.alpha
-    if circle.y - circle.radius <= 0:
+        if circle.type_of_circle == 'player':
+            circle.v *= np.abs(np.cos(circle.alpha))
+    if circle.y - circle.radius <= 0 and np.sin(circle.alpha) < 0:
         circle.alpha = -circle.alpha
-    if circle.x + circle.radius >= playground[0]:
+        if circle.type_of_circle == 'player':
+            circle.v *= np.abs(np.cos(circle.alpha))
+    if circle.x + circle.radius >= playground[0] and np.cos(circle.alpha) > 0:
         circle.alpha = np.pi - circle.alpha
-    if circle.x - circle.radius <= 0:
+        if circle.type_of_circle == 'player':
+            circle.v *= np.abs(np.sin(circle.alpha))
+    if circle.x - circle.radius <= 0 and np.cos(circle.alpha) < 0:
         circle.alpha = -np.pi - circle.alpha
+        if circle.type_of_circle == 'player':
+            circle.v *= np.abs(np.sin(circle.alpha))
     return circle
+
+
+def shoot(player, ball):
+    # ball.v += 20*np.cos(player.alpha)
+    rotation_speed = 5
+    v_x = ball.v*np.cos(ball.alpha) + rotation_speed*np.cos(player.alpha)
+    v_y = ball.v*np.sin(ball.alpha) + rotation_speed*np.sin(player.alpha)
+    # ball.v_x = ball.v*np.cos(player.alpha)
+    # ball.v_y = ball.v*np.sin(player.alpha)
+    ball.v = np.sqrt(v_x**2 + v_y**2)
+    ball.alpha = np.arctan2(v_y, v_x)
