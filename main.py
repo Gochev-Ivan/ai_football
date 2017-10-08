@@ -98,9 +98,10 @@ if __name__ == "__main__":
                     velocity_change = -velocity_step
                     player_1.v += velocity_change
                 if event.key == pygame.K_s:
-                    print("sut na topka aktiviran!")
-                    shoot_requst = True
-                    # shoot(player_1, ball)
+                    # print("sut na topka aktiviran!")
+                    print("dribling aktiviran!")
+                    shoot_requst = False
+                    dribble(player_1, ball)
                 if event.key == pygame.K_d:
                     print("sut na topka deaktiviran!")
                     shoot_requst = False

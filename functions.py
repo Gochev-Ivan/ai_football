@@ -121,12 +121,46 @@ def snelius(circle):
     return circle
 
 
-def shoot(player, ball):
+def dribble(player, ball):
     # ball.v += 20*np.cos(player.alpha)
-    rotation_speed = 5
-    v_x = ball.v*np.cos(ball.alpha) + rotation_speed*np.cos(player.alpha)
-    v_y = ball.v*np.sin(ball.alpha) + rotation_speed*np.sin(player.alpha)
-    # ball.v_x = ball.v*np.cos(player.alpha)
-    # ball.v_y = ball.v*np.sin(player.alpha)
-    ball.v = np.sqrt(v_x**2 + v_y**2)
-    ball.alpha = np.arctan2(v_y, v_x)
+    print("driblam!")
+    # ball.v += ball.v / (1 + 0.02*ball.v*dt)
+
+    dribble_speed = 1
+    ball.v += 0.1
+    Cl = 1/(2 + dribble_speed/(ball.v*ball.radius))
+    Cd = 0.55 + 1/(22.5 + 4.2*(dribble_speed/(ball.v*ball.radius))**(2.5)**0.4)
+
+    beta = 45
+    A = ball.radius**2 * np.pi
+    Fd = Cd * A * 1.21 * ball.v ** 2 / 2
+    Fl = Cl * A * 1.21 * ball.v ** 2 / 2
+    a_x = (1 / ball.mass) * ((-Fd) * np.cos(beta) - Fl * np.sin(beta)) * dt
+    a_y = (1 / ball.mass) * (Fl * np.cos(beta) - Fd * np.sin(beta)) * dt
+
+
+    ball.v_x += a_x*dt
+    ball.v_y += a_y*dt
+    # ball.v_x -= 1.21 * ball.v * (Cd * ball.v_x + Cl * ball.v_y)*dt
+    # ball.v_y += 1.21 * ball.v * (Cl * ball.v_x - Cd * ball.v_y)*dt
+    ball.v += np.sqrt(ball.v_x**2 + ball.v_y**2)
+    # ball.move()
+    # print("Cl, Cd , ball_v_x, ball_v_y, ball.alpha: ", Cl, Cd, ball.v_x, ball.v_y, ball.alpha)
+    print("Cl: {:3f} Cd: {:3f} ball_v_x: {:3f} ball_v_y: {:3f}: ball_alpha: {:3f}".format(Cl, Cd, ball.v_x, ball.v_y, ball.alpha))
+
+    ##
+    # F = Cl*A*1.21*dribble_speed**2/2
+    # a = F/ball.mass
+    # ball.v += a*dt
+
+
+
+
+    ##
+    # rotation_speed = 5
+    # v_x = ball.v*np.cos(ball.alpha) + rotation_speed*np.cos(player.alpha)
+    # v_y = ball.v*np.sin(ball.alpha) + rotation_speed*np.sin(player.alpha)
+    # # ball.v_x = ball.v*np.cos(player.alpha)
+    # # ball.v_y = ball.v*np.sin(player.alpha)
+    # ball.v = np.sqrt(v_x**2 + v_y**2)
+    # ball.alpha = np.arctan2(v_y, v_x)
