@@ -174,7 +174,7 @@ def game(team_1, team_2, ball, posts):
 
 
 def main():
-    team_1_players = [Player(500), Player(1), Player(2)]
+    team_1_players = [Player(0), Player(1), Player(2)]
     team_2_players = [Player(3), Player(4), Player(5)]
     ball = Ball(420, 250, 15, 0.5)
     posts = [Post(post_screen_left, post_screen_top, post_radius, 0),
