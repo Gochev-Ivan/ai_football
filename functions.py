@@ -36,6 +36,9 @@ class Player(Circle):
         self.a_fifa = int(player['Acceleration'])
         self.v_fifa = int(player['Speed'])
         self.shot_power_fifa = int(player['Radius'])
+        self.v_max = 500 * self.v_fifa
+        self.a_max = 1000 * self.a_fifa
+        self.shot_power_max = 500 * self.shot_power_fifa
 
     def move(self, manager_decision):
         force = np.clip(manager_decision['force'], -0.5 * self.a_max * self.mass, self.a_max * self.mass)
@@ -54,7 +57,9 @@ class Player(Circle):
         pygame.draw.line(screen, black, [self.x, self.y], [new_x, new_y], cursor_width)
 
     def data(self):
-        player_data = {'x': self.x, 'y': self.y, 'alpha': self.alpha, 'mass': self.mass, 'radius': self.radius}
+        player_data = {'x': self.x, 'y': self.y, 'alpha': self.alpha, 'mass': self.mass, 'radius': self.radius,
+                       'v_max': self.v_max, 'a_max': self.a_max, 'shot_power': self.shot_power,
+                       'shot_power_max': self.shot_power_max, 'shot_power_fifa': self.shot_power_fifa}
         return player_data
 
     def snelius(self):
