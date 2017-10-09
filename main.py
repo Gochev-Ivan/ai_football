@@ -16,6 +16,9 @@ def render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time
     pygame.draw.circle(screen, white, center, 100, 2)
     pygame.draw.circle(screen, white, center, 5)
 
+
+    # Draw referee
+
     for player in team_1:
         player.draw(screen, team_1_color)
     for player in team_2:
@@ -139,8 +142,8 @@ def play(screen, team_1, team_2, ball, posts, time_to_play, team_1_score, team_2
 
 def game(team_1, team_2, ball, posts):
     pygame.init()
-    # screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
-    screen = pygame.display.set_mode(resolution)
+    screen = pygame.display.set_mode(resolution, pygame.FULLSCREEN)
+    # screen = pygame.display.set_mode(resolution)
     pygame.display.set_caption(game_name)
     # background = pygame.image.load(background_picture).convert()
     # screen.blit(background, (0, 0))

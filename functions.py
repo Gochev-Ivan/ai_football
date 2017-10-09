@@ -22,9 +22,12 @@ class Player(Circle):
     a_fifa = 0.75
     v_fifa = 0.88
     shot_power_fifa = 0.95
-    a_max = 1000 * a_fifa
-    v_max = 500 * v_fifa
-    shot_power_max = 500 * shot_power_fifa
+    a_max_coeff = 22 # 22 max
+    v_max_coeff = 7 # 7 max?
+    shot_power_max_coeff = 200
+    a_max = a_max_coeff * a_fifa
+    v_max = v_max_coeff * v_fifa
+    shot_power_max = shot_power_max_coeff * shot_power_fifa
     shot_power = shot_power_max
     shot_request = False
 
@@ -36,9 +39,9 @@ class Player(Circle):
         self.a_fifa = int(player['Acceleration'])
         self.v_fifa = int(player['Speed'])
         self.shot_power_fifa = int(player['Radius'])
-        self.v_max = 500 * self.v_fifa
-        self.a_max = 1000 * self.a_fifa
-        self.shot_power_max = 500 * self.shot_power_fifa
+        self.v_max = self.v_max_coeff * self.v_fifa
+        self.a_max = self.a_max_coeff * self.a_fifa
+        self.shot_power_max = self.shot_power_max_coeff * self.shot_power_fifa
 
     def move(self, manager_decision):
         force = np.clip(manager_decision['force'], -0.5 * self.a_max * self.mass, self.a_max * self.mass)
@@ -87,7 +90,7 @@ class Player(Circle):
 
 
 class Ball(Circle):
-    v_max = 1500
+    v_max = 850
     radius = 15
     mass = 0.5
 
