@@ -38,7 +38,7 @@ class Player(Circle):
         self.radius = int(player['Radius'])
         self.a_fifa = int(player['Acceleration'])
         self.v_fifa = int(player['Speed'])
-        self.shot_power_fifa = int(player['Radius'])
+        self.shot_power_fifa = int(player['Shot_power'])
         self.v_max = self.v_max_coeff * self.v_fifa
         self.a_max = self.a_max_coeff * self.a_fifa
         self.shot_power_max = self.shot_power_max_coeff * self.shot_power_fifa

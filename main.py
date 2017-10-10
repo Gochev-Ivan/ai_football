@@ -1,11 +1,11 @@
 from functions import *
 import numpy as np
 import football_manager as football_manager_1
-import football_manager as football_manager_2
+import football_manager_2 as football_manager_2
 import time
 
 
-def render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time_to_play, start, countdown=False):
+def render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time_to_play, start, half, countdown=False):
     # screen.blit(background, (0, 0))
     pygame.draw.rect(screen, white, resolution_rect)
     pygame.draw.rect(screen, grass, ground_rect)
@@ -15,7 +15,6 @@ def render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time
     pygame.draw.rect(screen, white, half_playground_rect, 2)
     pygame.draw.circle(screen, white, center, 100, 2)
     pygame.draw.circle(screen, white, center, 5)
-
 
     # Draw referee
 
@@ -40,7 +39,11 @@ def render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time
         screen.blit(label, (700, 0))
 
     myfont = pygame.font.SysFont("monospace", 150)
-    message = "{}:{}".format(team_2_score, team_1_score)
+    if half == 1:
+        message = "{}:{}".format(team_1_score, team_2_score)
+    else:
+        message = "{}:{}".format(team_2_score, team_1_score)
+
     label = myfont.render(message, 1, (0, 0, 0))
     screen.blit(label, (300, 0))
 
@@ -51,7 +54,7 @@ def render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time
 def play(screen, team_1, team_2, ball, posts, time_to_play, team_1_score, team_2_score, half):
     start = time.time()
     while time.time() - start < 3:
-        render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time_to_play, start, True)
+        render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time_to_play, start, half, True)
 
     start = time.time()
     velocity_step = 100000
@@ -98,14 +101,18 @@ def play(screen, team_1, team_2, ball, posts, time_to_play, team_1_score, team_2
                 ball=ball.data(),
                 your_side='left' if half == 1 else 'right',
                 half=half,
-                time_left=time_to_play - int(time.time() - start))
+                time_left=time_to_play - int(time.time() - start),
+                our_score=team_1_score,
+                their_score=team_2_score)
             manager_2_decision = football_manager_2.decision(
                 our_team=[team_2[0].data(), team_2[1].data(), team_2[2].data()],
                 their_team=[team_1[0].data(), team_1[1].data(), team_1[2].data()],
                 ball=ball.data(),
                 your_side='right' if half == 1 else 'left',
                 half=half,
-                time_left=time_to_play - int(time.time() - start))
+                time_left=time_to_play - int(time.time() - start),
+                our_score=team_2_score,
+                their_score=team_1_score)
 
         manager_decision = [manager_1_decision[0], manager_1_decision[1], manager_1_decision[2],
                             manager_2_decision[0], manager_2_decision[1], manager_2_decision[2]]
@@ -120,13 +127,19 @@ def play(screen, team_1, team_2, ball, posts, time_to_play, team_1_score, team_2
                 player.move()
 
         if not goal:
-            goal_team_1 = post_screen_top < ball.y < post_screen_bottom and ball.x < post_screen_left
-            goal_team_2 = post_screen_top < ball.y < post_screen_bottom and ball.x > post_screen_right
-            if goal_team_1:
-                team_1_score += 1
-            if goal_team_2:
-                team_2_score += 1
-            goal = goal_team_1 or goal_team_2
+            goal_team_right = post_screen_top < ball.y < post_screen_bottom and ball.x < post_screen_left
+            goal_team_left = post_screen_top < ball.y < post_screen_bottom and ball.x > post_screen_right
+            if goal_team_left:
+                if half == 1:
+                    team_1_score += 1
+                else:
+                    team_2_score += 1
+            if goal_team_right:
+                if half == 1:
+                    team_2_score += 1
+                else:
+                    team_1_score += 1
+            goal = goal_team_left or goal_team_right
         else:
             return True, time_to_play - int(time.time() - start), team_1_score, team_2_score
 
@@ -137,7 +150,7 @@ def play(screen, team_1, team_2, ball, posts, time_to_play, team_1_score, team_2
                     if collision(circles[i], circles[j]):
                         circles[i], circles[j] = resolve_collision(circles[i], circles[j])
 
-        render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time_to_play, start)
+        render(screen, team_1, team_2, ball, posts, team_1_score, team_2_score, time_to_play, start, half)
 
 
 def game(team_1, team_2, ball, posts):
@@ -167,8 +180,8 @@ def game(team_1, team_2, ball, posts):
         for i, player in enumerate(team_1):
                 player.reset(initial_positions_team_right[i], np.pi)
         ball.reset()
-        goal, time_to_play, team_2_score, team_1_score = \
-            play(screen, team_1, team_2, ball, posts, time_to_play, team_2_score, team_1_score, 2)
+        goal, time_to_play, team_1_score, team_2_score = \
+            play(screen, team_1, team_2, ball, posts, time_to_play, team_1_score, team_2_score, 2)
 
     pygame.quit()
 
