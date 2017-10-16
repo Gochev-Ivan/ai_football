@@ -66,7 +66,7 @@ def crossover(agents):
 
     offspring = []
 
-    for _ in range((population - len(agents)) / 2):
+    for _ in range(int((population - len(agents)) / 2)):
 
         parent1 = random.choice(agents)
         parent2 = random.choice(agents)
@@ -98,7 +98,6 @@ def mutation(agents):
 
 
 if __name__ == '__main__':
-
     in_str = 'TroySquillaci'
     in_str_len = len(in_str)
     ga()

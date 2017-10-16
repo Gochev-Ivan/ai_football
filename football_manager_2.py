@@ -6,6 +6,6 @@ def decision(our_team, their_team, ball, your_side, half, time_left, our_score, 
         manager_decision[i]['force'] = 0
         manager_decision[i]['shot_request'] = True
         manager_decision[i]['shot_power'] = 100000
-    print(our_score, their_score)
+    # print(our_score, their_score)
     return manager_decision
 
